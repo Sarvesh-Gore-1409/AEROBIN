@@ -1,0 +1,10 @@
+--- AeroBins Odour Model Evaluation (Tuned Model) ---
+
+Loading model from D:\Aerobin\SARVSH\SARVSH\scripts\..\datasets\odour_model.pkl...
+
+--- Testing on Synthetic Unseen Scenarios ---
+Scenario 1: Good (Expected) vs Good (Predicted) [OK]
+Scenario 2: Moderate (Expected) vs Good (Predicted) [FAIL]
+   -> Inputs: Temp=25.0, Fill=90, VOC=50
+Scenario 3: Severe (Expected) vs Poor (Predicted) [FAIL]
+Scenario 4: Moderate (Expected) vs Moderate (Predicted) [OK]

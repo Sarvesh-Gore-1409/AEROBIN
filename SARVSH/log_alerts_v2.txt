@@ -1,0 +1,813 @@
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.3.5)
+
+2025-12-14T19:04:32.073+05:30  INFO 22784 --- [           main] c.aerobins.backend.AeroBinsApplication   : Starting AeroBinsApplication v0.0.1-SNAPSHOT using Java 21.0.9 with PID 22784 (D:\Aerobin\SARVSH\SARVSH\target\backend-0.0.1-SNAPSHOT.jar started by sarve in D:\Aerobin\SARVSH\SARVSH)
+2025-12-14T19:04:32.076+05:30  INFO 22784 --- [           main] c.aerobins.backend.AeroBinsApplication   : No active profile set, falling back to 1 default profile: "default"
+2025-12-14T19:04:32.751+05:30  INFO 22784 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-12-14T19:04:32.861+05:30  INFO 22784 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 96 ms. Found 4 JPA repository interfaces.
+2025-12-14T19:04:33.483+05:30  INFO 22784 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-12-14T19:04:33.496+05:30  INFO 22784 --- [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-12-14T19:04:33.496+05:30  INFO 22784 --- [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.31]
+2025-12-14T19:04:33.528+05:30  INFO 22784 --- [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-12-14T19:04:33.529+05:30  INFO 22784 --- [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1396 ms
+2025-12-14T19:04:33.714+05:30  INFO 22784 --- [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-12-14T19:04:33.779+05:30  INFO 22784 --- [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.5.3.Final
+2025-12-14T19:04:33.826+05:30  INFO 22784 --- [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-12-14T19:04:34.137+05:30  INFO 22784 --- [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-12-14T19:04:34.173+05:30  INFO 22784 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-12-14T19:04:34.351+05:30  INFO 22784 --- [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@749baa0c
+2025-12-14T19:04:34.352+05:30  INFO 22784 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-12-14T19:04:34.395+05:30  WARN 22784 --- [           main] org.hibernate.orm.deprecation            : HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-12-14T19:04:35.127+05:30  INFO 22784 --- [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+Hibernate: 
+    alter table alerts 
+       drop 
+       foreign key FK43tr6ut3nxicd5rjloyth9f9u
+2025-12-14T19:04:35.163+05:30  WARN 22784 --- [           main] o.h.t.s.i.ExceptionHandlerLoggedImpl     : GenerationTarget encountered exception accepting command : Error executing DDL "
+    alter table alerts 
+       drop 
+       foreign key FK43tr6ut3nxicd5rjloyth9f9u" via JDBC [Can't DROP 'FK43tr6ut3nxicd5rjloyth9f9u'; check that column/key exists]
+
+org.hibernate.tool.schema.spi.CommandAcceptanceException: Error executing DDL "
+    alter table alerts 
+       drop 
+       foreign key FK43tr6ut3nxicd5rjloyth9f9u" via JDBC [Can't DROP 'FK43tr6ut3nxicd5rjloyth9f9u'; check that column/key exists]
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:94) ~[hibernate-core-6.5.3.Final.jar!/:6.5.3.Final]
+	at org.hibernate.tool.schema.internal.Helper.applySqlString(Helper.java:233) ~[hibernate-core-6.5.3.Final.jar!/:6.5.3.Final]
+	at org.hibernate.tool.schema.internal.Helper.applySqlStrings(Helper.java:217) ~[hibernate-core-6.5.3.Final.jar!/:6.5.3.Final]
+	at org.hibernate.tool.schema.internal.SchemaDropperImpl.applyConstraintDropping(SchemaDropperImpl.java:476) ~[hibernate-core-6.5.3.Final.jar!/:6.5.3.Final]
+	at org.hibernate.tool.schema.internal.SchemaDropperImpl.dropConstraintsTablesSequences(SchemaDropperImpl.java:242) ~[hibernate-core-6.5.3.Final.jar!/:6.5.3.Final]
+	at org.hibernate.tool.schema.internal.SchemaDropperImpl.dropFromMetadata(SchemaDropperImpl.java:215) ~[hibernate-core-6.5.3.Final.jar!/:6.5.3.Final]
+	at org.hibernate.tool.schema.internal.SchemaDropperImpl.performDrop(SchemaDropperImpl.java:185) ~[hibernate-core-6.5.3.Final.jar!/:6.5.3.Final]
+	at org.hibernate.tool.schema.internal.SchemaDropperImpl.doDrop(SchemaDropperImpl.java:155) ~[hibernate-core-6.5.3.Final.jar!/:6.5.3.Final]
+	at org.hibernate.tool.schema.internal.SchemaDropperImpl.doDrop(SchemaDropperImpl.java:115) ~[hibernate-core-6.5.3.Final.jar!/:6.5.3.Final]
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.performDatabaseAction(SchemaManagementToolCoordinator.java:238) ~[hibernate-core-6.5.3.Final.jar!/:6.5.3.Final]
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.lambda$process$5(SchemaManagementToolCoordinator.java:144) ~[hibernate-core-6.5.3.Final.jar!/:6.5.3.Final]
+	at java.base/java.util.HashMap.forEach(HashMap.java:1429) ~[na:na]
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.process(SchemaManagementToolCoordinator.java:141) ~[hibernate-core-6.5.3.Final.jar!/:6.5.3.Final]
+	at org.hibernate.boot.internal.SessionFactoryObserverForSchemaExport.sessionFactoryCreated(SessionFactoryObserverForSchemaExport.java:37) ~[hibernate-core-6.5.3.Final.jar!/:6.5.3.Final]
+	at org.hibernate.internal.SessionFactoryObserverChain.sessionFactoryCreated(SessionFactoryObserverChain.java:35) ~[hibernate-core-6.5.3.Final.jar!/:6.5.3.Final]
+	at org.hibernate.internal.SessionFactoryImpl.<init>(SessionFactoryImpl.java:322) ~[hibernate-core-6.5.3.Final.jar!/:6.5.3.Final]
+	at org.hibernate.boot.internal.SessionFactoryBuilderImpl.build(SessionFactoryBuilderImpl.java:457) ~[hibernate-core-6.5.3.Final.jar!/:6.5.3.Final]
+	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1506) ~[hibernate-core-6.5.3.Final.jar!/:6.5.3.Final]
+	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:75) ~[spring-orm-6.1.14.jar!/:6.1.14]
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:390) ~[spring-orm-6.1.14.jar!/:6.1.14]
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:409) ~[spring-orm-6.1.14.jar!/:6.1.14]
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:396) ~[spring-orm-6.1.14.jar!/:6.1.14]
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:366) ~[spring-orm-6.1.14.jar!/:6.1.14]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1853) ~[spring-beans-6.1.14.jar!/:6.1.14]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1802) ~[spring-beans-6.1.14.jar!/:6.1.14]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:600) ~[spring-beans-6.1.14.jar!/:6.1.14]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:522) ~[spring-beans-6.1.14.jar!/:6.1.14]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:337) ~[spring-beans-6.1.14.jar!/:6.1.14]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234) ~[spring-beans-6.1.14.jar!/:6.1.14]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:335) ~[spring-beans-6.1.14.jar!/:6.1.14]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:205) ~[spring-beans-6.1.14.jar!/:6.1.14]
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:954) ~[spring-context-6.1.14.jar!/:6.1.14]
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:625) ~[spring-context-6.1.14.jar!/:6.1.14]
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146) ~[spring-boot-3.3.5.jar!/:3.3.5]
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:754) ~[spring-boot-3.3.5.jar!/:3.3.5]
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:456) ~[spring-boot-3.3.5.jar!/:3.3.5]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:335) ~[spring-boot-3.3.5.jar!/:3.3.5]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363) ~[spring-boot-3.3.5.jar!/:3.3.5]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352) ~[spring-boot-3.3.5.jar!/:3.3.5]
+	at com.aerobins.backend.AeroBinsApplication.main(AeroBinsApplication.java:10) ~[!/:0.0.1-SNAPSHOT]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
+	at org.springframework.boot.loader.launch.Launcher.launch(Launcher.java:102) ~[backend-0.0.1-SNAPSHOT.jar:0.0.1-SNAPSHOT]
+	at org.springframework.boot.loader.launch.Launcher.launch(Launcher.java:64) ~[backend-0.0.1-SNAPSHOT.jar:0.0.1-SNAPSHOT]
+	at org.springframework.boot.loader.launch.JarLauncher.main(JarLauncher.java:40) ~[backend-0.0.1-SNAPSHOT.jar:0.0.1-SNAPSHOT]
+Caused by: java.sql.SQLSyntaxErrorException: Can't DROP 'FK43tr6ut3nxicd5rjloyth9f9u'; check that column/key exists
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:121) ~[mysql-connector-j-8.3.0.jar!/:8.3.0]
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:122) ~[mysql-connector-j-8.3.0.jar!/:8.3.0]
+	at com.mysql.cj.jdbc.StatementImpl.executeInternal(StatementImpl.java:770) ~[mysql-connector-j-8.3.0.jar!/:8.3.0]
+	at com.mysql.cj.jdbc.StatementImpl.execute(StatementImpl.java:653) ~[mysql-connector-j-8.3.0.jar!/:8.3.0]
+	at com.zaxxer.hikari.pool.ProxyStatement.execute(ProxyStatement.java:94) ~[HikariCP-5.1.0.jar!/:na]
+	at com.zaxxer.hikari.pool.HikariProxyStatement.execute(HikariProxyStatement.java) ~[HikariCP-5.1.0.jar!/:na]
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:80) ~[hibernate-core-6.5.3.Final.jar!/:6.5.3.Final]
+	... 44 common frames omitted
+
+Hibernate: 
+    alter table routes 
+       drop 
+       foreign key FKt6gpido4jm4f3cyog3btapos9
+Hibernate: 
+    drop table if exists alerts
+Hibernate: 
+    drop table if exists dustbins_live
+Hibernate: 
+    drop table if exists login_activity_log
+Hibernate: 
+    drop table if exists routes
+Hibernate: 
+    create table alerts (
+        severity_level integer,
+        alert_id bigint not null auto_increment,
+        created_at datetime(6),
+        dustbin_id bigint not null,
+        alert_message TEXT,
+        alert_type varchar(255) not null,
+        status varchar(255) not null,
+        primary key (alert_id)
+    ) engine=InnoDB
+Hibernate: 
+    create table dustbins_live (
+        fill_level integer not null,
+        latitude float(53) not null,
+        longitude float(53) not null,
+        odor_level float(53) not null,
+        created_at datetime(6),
+        dustbin_id bigint not null auto_increment,
+        last_updated datetime(6),
+        bin_id varchar(255) not null,
+        location_name varchar(255) not null,
+        status varchar(255) not null,
+        primary key (dustbin_id)
+    ) engine=InnoDB
+Hibernate: 
+    create table login_activity_log (
+        success bit not null,
+        id bigint not null auto_increment,
+        login_timestamp datetime(6) not null,
+        ip_address varchar(255),
+        password varchar(255),
+        user_agent varchar(255),
+        username varchar(255) not null,
+        primary key (id)
+    ) engine=InnoDB
+Hibernate: 
+    create table routes (
+        distance_km decimal(9,3),
+        estimated_time_min integer,
+        dustbin_id bigint not null,
+        generated_at datetime(6),
+        route_id bigint not null auto_increment,
+        optimized_path_json TEXT,
+        primary key (route_id)
+    ) engine=InnoDB
+Hibernate: 
+    alter table dustbins_live 
+       add constraint UKibnpjipqtvjw6lk2wtsprinsf unique (bin_id)
+Hibernate: 
+    alter table alerts 
+       add constraint FK43tr6ut3nxicd5rjloyth9f9u 
+       foreign key (dustbin_id) 
+       references dustbins_live (dustbin_id)
+Hibernate: 
+    alter table routes 
+       add constraint FKt6gpido4jm4f3cyog3btapos9 
+       foreign key (dustbin_id) 
+       references dustbins_live (dustbin_id)
+2025-12-14T19:04:35.331+05:30  INFO 22784 --- [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-12-14T19:04:35.817+05:30  INFO 22784 --- [           main] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page: class path resource [static/index.html]
+2025-12-14T19:04:36.161+05:30  INFO 22784 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2025-12-14T19:04:36.176+05:30  INFO 22784 --- [           main] c.aerobins.backend.AeroBinsApplication   : Started AeroBinsApplication in 4.494 seconds (process running for 4.921)
+Hibernate: 
+    select
+        count(*) 
+    from
+        dustbins_live d1_0
+Initializing Database with Mock Dustbins...
+Hibernate: 
+    insert 
+    into
+        dustbins_live
+        (bin_id, created_at, fill_level, last_updated, latitude, location_name, longitude, odor_level, status) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        dustbins_live
+        (bin_id, created_at, fill_level, last_updated, latitude, location_name, longitude, odor_level, status) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        dustbins_live
+        (bin_id, created_at, fill_level, last_updated, latitude, location_name, longitude, odor_level, status) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        dustbins_live
+        (bin_id, created_at, fill_level, last_updated, latitude, location_name, longitude, odor_level, status) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        dustbins_live
+        (bin_id, created_at, fill_level, last_updated, latitude, location_name, longitude, odor_level, status) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        dustbins_live
+        (bin_id, created_at, fill_level, last_updated, latitude, location_name, longitude, odor_level, status) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        dustbins_live
+        (bin_id, created_at, fill_level, last_updated, latitude, location_name, longitude, odor_level, status) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?)
+Database initialization completed.
+Hibernate: 
+    select
+        count(*) 
+    from
+        routes r1_0
+Initializing Database with Mock Routes...
+Hibernate: 
+    select
+        d1_0.dustbin_id,
+        d1_0.bin_id,
+        d1_0.created_at,
+        d1_0.fill_level,
+        d1_0.last_updated,
+        d1_0.latitude,
+        d1_0.location_name,
+        d1_0.longitude,
+        d1_0.odor_level,
+        d1_0.status 
+    from
+        dustbins_live d1_0 
+    where
+        d1_0.bin_id=?
+Hibernate: 
+    insert 
+    into
+        routes
+        (distance_km, dustbin_id, estimated_time_min, generated_at, optimized_path_json) 
+    values
+        (?, ?, ?, ?, ?)
+Hibernate: 
+    select
+        d1_0.dustbin_id,
+        d1_0.bin_id,
+        d1_0.created_at,
+        d1_0.fill_level,
+        d1_0.last_updated,
+        d1_0.latitude,
+        d1_0.location_name,
+        d1_0.longitude,
+        d1_0.odor_level,
+        d1_0.status 
+    from
+        dustbins_live d1_0 
+    where
+        d1_0.bin_id=?
+Hibernate: 
+    insert 
+    into
+        routes
+        (distance_km, dustbin_id, estimated_time_min, generated_at, optimized_path_json) 
+    values
+        (?, ?, ?, ?, ?)
+Hibernate: 
+    select
+        d1_0.dustbin_id,
+        d1_0.bin_id,
+        d1_0.created_at,
+        d1_0.fill_level,
+        d1_0.last_updated,
+        d1_0.latitude,
+        d1_0.location_name,
+        d1_0.longitude,
+        d1_0.odor_level,
+        d1_0.status 
+    from
+        dustbins_live d1_0 
+    where
+        d1_0.bin_id=?
+Hibernate: 
+    insert 
+    into
+        routes
+        (distance_km, dustbin_id, estimated_time_min, generated_at, optimized_path_json) 
+    values
+        (?, ?, ?, ?, ?)
+Route initialization completed.
+Hibernate: 
+    select
+        count(*) 
+    from
+        alerts a1_0
+Initializing Database with Mock Alerts...
+Hibernate: 
+    select
+        d1_0.dustbin_id,
+        d1_0.bin_id,
+        d1_0.created_at,
+        d1_0.fill_level,
+        d1_0.last_updated,
+        d1_0.latitude,
+        d1_0.location_name,
+        d1_0.longitude,
+        d1_0.odor_level,
+        d1_0.status 
+    from
+        dustbins_live d1_0 
+    where
+        d1_0.bin_id=?
+Hibernate: 
+    insert 
+    into
+        alerts
+        (alert_message, alert_type, created_at, dustbin_id, severity_level, status) 
+    values
+        (?, ?, ?, ?, ?, ?)
+Hibernate: 
+    select
+        d1_0.dustbin_id,
+        d1_0.bin_id,
+        d1_0.created_at,
+        d1_0.fill_level,
+        d1_0.last_updated,
+        d1_0.latitude,
+        d1_0.location_name,
+        d1_0.longitude,
+        d1_0.odor_level,
+        d1_0.status 
+    from
+        dustbins_live d1_0 
+    where
+        d1_0.bin_id=?
+Hibernate: 
+    insert 
+    into
+        alerts
+        (alert_message, alert_type, created_at, dustbin_id, severity_level, status) 
+    values
+        (?, ?, ?, ?, ?, ?)
+Hibernate: 
+    select
+        d1_0.dustbin_id,
+        d1_0.bin_id,
+        d1_0.created_at,
+        d1_0.fill_level,
+        d1_0.last_updated,
+        d1_0.latitude,
+        d1_0.location_name,
+        d1_0.longitude,
+        d1_0.odor_level,
+        d1_0.status 
+    from
+        dustbins_live d1_0 
+    where
+        d1_0.bin_id=?
+Hibernate: 
+    insert 
+    into
+        alerts
+        (alert_message, alert_type, created_at, dustbin_id, severity_level, status) 
+    values
+        (?, ?, ?, ?, ?, ?)
+Alert initialization completed.
+2025-12-14T19:05:45.919+05:30  INFO 22784 --- [nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-12-14T19:05:45.920+05:30  INFO 22784 --- [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-12-14T19:05:45.921+05:30  INFO 22784 --- [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+Hibernate: 
+    select
+        d1_0.dustbin_id,
+        d1_0.bin_id,
+        d1_0.created_at,
+        d1_0.fill_level,
+        d1_0.last_updated,
+        d1_0.latitude,
+        d1_0.location_name,
+        d1_0.longitude,
+        d1_0.odor_level,
+        d1_0.status 
+    from
+        dustbins_live d1_0
+Hibernate: 
+    select
+        a1_0.alert_id,
+        a1_0.alert_message,
+        a1_0.alert_type,
+        a1_0.created_at,
+        a1_0.dustbin_id,
+        a1_0.severity_level,
+        a1_0.status 
+    from
+        alerts a1_0
+Hibernate: 
+    select
+        d1_0.dustbin_id,
+        d1_0.bin_id,
+        d1_0.created_at,
+        d1_0.fill_level,
+        d1_0.last_updated,
+        d1_0.latitude,
+        d1_0.location_name,
+        d1_0.longitude,
+        d1_0.odor_level,
+        d1_0.status 
+    from
+        dustbins_live d1_0 
+    where
+        d1_0.dustbin_id=?
+Hibernate: 
+    select
+        d1_0.dustbin_id,
+        d1_0.bin_id,
+        d1_0.created_at,
+        d1_0.fill_level,
+        d1_0.last_updated,
+        d1_0.latitude,
+        d1_0.location_name,
+        d1_0.longitude,
+        d1_0.odor_level,
+        d1_0.status 
+    from
+        dustbins_live d1_0 
+    where
+        d1_0.dustbin_id=?
+Hibernate: 
+    select
+        d1_0.dustbin_id,
+        d1_0.bin_id,
+        d1_0.created_at,
+        d1_0.fill_level,
+        d1_0.last_updated,
+        d1_0.latitude,
+        d1_0.location_name,
+        d1_0.longitude,
+        d1_0.odor_level,
+        d1_0.status 
+    from
+        dustbins_live d1_0 
+    where
+        d1_0.dustbin_id=?
+Hibernate: 
+    select
+        a1_0.alert_id,
+        a1_0.alert_message,
+        a1_0.alert_type,
+        a1_0.created_at,
+        a1_0.dustbin_id,
+        d1_0.dustbin_id,
+        d1_0.bin_id,
+        d1_0.created_at,
+        d1_0.fill_level,
+        d1_0.last_updated,
+        d1_0.latitude,
+        d1_0.location_name,
+        d1_0.longitude,
+        d1_0.odor_level,
+        d1_0.status,
+        a1_0.severity_level,
+        a1_0.status 
+    from
+        alerts a1_0 
+    join
+        dustbins_live d1_0 
+            on d1_0.dustbin_id=a1_0.dustbin_id 
+    where
+        a1_0.alert_id=?
+Hibernate: 
+    select
+        a1_0.alert_id,
+        a1_0.alert_message,
+        a1_0.alert_type,
+        a1_0.created_at,
+        a1_0.dustbin_id,
+        d1_0.dustbin_id,
+        d1_0.bin_id,
+        d1_0.created_at,
+        d1_0.fill_level,
+        d1_0.last_updated,
+        d1_0.latitude,
+        d1_0.location_name,
+        d1_0.longitude,
+        d1_0.odor_level,
+        d1_0.status,
+        a1_0.severity_level,
+        a1_0.status 
+    from
+        alerts a1_0 
+    join
+        dustbins_live d1_0 
+            on d1_0.dustbin_id=a1_0.dustbin_id 
+    where
+        a1_0.alert_id=?
+Hibernate: 
+    update
+        alerts 
+    set
+        alert_message=?,
+        alert_type=?,
+        created_at=?,
+        dustbin_id=?,
+        severity_level=?,
+        status=? 
+    where
+        alert_id=?
+Hibernate: 
+    select
+        a1_0.alert_id,
+        a1_0.alert_message,
+        a1_0.alert_type,
+        a1_0.created_at,
+        a1_0.dustbin_id,
+        a1_0.severity_level,
+        a1_0.status 
+    from
+        alerts a1_0
+Hibernate: 
+    select
+        d1_0.dustbin_id,
+        d1_0.bin_id,
+        d1_0.created_at,
+        d1_0.fill_level,
+        d1_0.last_updated,
+        d1_0.latitude,
+        d1_0.location_name,
+        d1_0.longitude,
+        d1_0.odor_level,
+        d1_0.status 
+    from
+        dustbins_live d1_0 
+    where
+        d1_0.dustbin_id=?
+Hibernate: 
+    select
+        d1_0.dustbin_id,
+        d1_0.bin_id,
+        d1_0.created_at,
+        d1_0.fill_level,
+        d1_0.last_updated,
+        d1_0.latitude,
+        d1_0.location_name,
+        d1_0.longitude,
+        d1_0.odor_level,
+        d1_0.status 
+    from
+        dustbins_live d1_0 
+    where
+        d1_0.dustbin_id=?
+Hibernate: 
+    select
+        d1_0.dustbin_id,
+        d1_0.bin_id,
+        d1_0.created_at,
+        d1_0.fill_level,
+        d1_0.last_updated,
+        d1_0.latitude,
+        d1_0.location_name,
+        d1_0.longitude,
+        d1_0.odor_level,
+        d1_0.status 
+    from
+        dustbins_live d1_0 
+    where
+        d1_0.dustbin_id=?
+Hibernate: 
+    select
+        a1_0.alert_id,
+        a1_0.alert_message,
+        a1_0.alert_type,
+        a1_0.created_at,
+        a1_0.dustbin_id,
+        a1_0.severity_level,
+        a1_0.status 
+    from
+        alerts a1_0
+Hibernate: 
+    select
+        d1_0.dustbin_id,
+        d1_0.bin_id,
+        d1_0.created_at,
+        d1_0.fill_level,
+        d1_0.last_updated,
+        d1_0.latitude,
+        d1_0.location_name,
+        d1_0.longitude,
+        d1_0.odor_level,
+        d1_0.status 
+    from
+        dustbins_live d1_0 
+    where
+        d1_0.dustbin_id=?
+Hibernate: 
+    select
+        d1_0.dustbin_id,
+        d1_0.bin_id,
+        d1_0.created_at,
+        d1_0.fill_level,
+        d1_0.last_updated,
+        d1_0.latitude,
+        d1_0.location_name,
+        d1_0.longitude,
+        d1_0.odor_level,
+        d1_0.status 
+    from
+        dustbins_live d1_0 
+    where
+        d1_0.dustbin_id=?
+Hibernate: 
+    select
+        d1_0.dustbin_id,
+        d1_0.bin_id,
+        d1_0.created_at,
+        d1_0.fill_level,
+        d1_0.last_updated,
+        d1_0.latitude,
+        d1_0.location_name,
+        d1_0.longitude,
+        d1_0.odor_level,
+        d1_0.status 
+    from
+        dustbins_live d1_0 
+    where
+        d1_0.dustbin_id=?
+Hibernate: 
+    select
+        r1_0.route_id,
+        r1_0.distance_km,
+        r1_0.dustbin_id,
+        r1_0.estimated_time_min,
+        r1_0.generated_at,
+        r1_0.optimized_path_json 
+    from
+        routes r1_0
+Hibernate: 
+    select
+        d1_0.dustbin_id,
+        d1_0.bin_id,
+        d1_0.created_at,
+        d1_0.fill_level,
+        d1_0.last_updated,
+        d1_0.latitude,
+        d1_0.location_name,
+        d1_0.longitude,
+        d1_0.odor_level,
+        d1_0.status 
+    from
+        dustbins_live d1_0 
+    where
+        d1_0.dustbin_id=?
+Hibernate: 
+    select
+        d1_0.dustbin_id,
+        d1_0.bin_id,
+        d1_0.created_at,
+        d1_0.fill_level,
+        d1_0.last_updated,
+        d1_0.latitude,
+        d1_0.location_name,
+        d1_0.longitude,
+        d1_0.odor_level,
+        d1_0.status 
+    from
+        dustbins_live d1_0 
+    where
+        d1_0.dustbin_id=?
+Hibernate: 
+    select
+        d1_0.dustbin_id,
+        d1_0.bin_id,
+        d1_0.created_at,
+        d1_0.fill_level,
+        d1_0.last_updated,
+        d1_0.latitude,
+        d1_0.location_name,
+        d1_0.longitude,
+        d1_0.odor_level,
+        d1_0.status 
+    from
+        dustbins_live d1_0 
+    where
+        d1_0.dustbin_id=?
+Hibernate: 
+    select
+        a1_0.alert_id,
+        a1_0.alert_message,
+        a1_0.alert_type,
+        a1_0.created_at,
+        a1_0.dustbin_id,
+        a1_0.severity_level,
+        a1_0.status 
+    from
+        alerts a1_0
+Hibernate: 
+    select
+        d1_0.dustbin_id,
+        d1_0.bin_id,
+        d1_0.created_at,
+        d1_0.fill_level,
+        d1_0.last_updated,
+        d1_0.latitude,
+        d1_0.location_name,
+        d1_0.longitude,
+        d1_0.odor_level,
+        d1_0.status 
+    from
+        dustbins_live d1_0 
+    where
+        d1_0.dustbin_id=?
+Hibernate: 
+    select
+        d1_0.dustbin_id,
+        d1_0.bin_id,
+        d1_0.created_at,
+        d1_0.fill_level,
+        d1_0.last_updated,
+        d1_0.latitude,
+        d1_0.location_name,
+        d1_0.longitude,
+        d1_0.odor_level,
+        d1_0.status 
+    from
+        dustbins_live d1_0 
+    where
+        d1_0.dustbin_id=?
+Hibernate: 
+    select
+        d1_0.dustbin_id,
+        d1_0.bin_id,
+        d1_0.created_at,
+        d1_0.fill_level,
+        d1_0.last_updated,
+        d1_0.latitude,
+        d1_0.location_name,
+        d1_0.longitude,
+        d1_0.odor_level,
+        d1_0.status 
+    from
+        dustbins_live d1_0 
+    where
+        d1_0.dustbin_id=?
+Hibernate: 
+    select
+        a1_0.alert_id,
+        a1_0.alert_message,
+        a1_0.alert_type,
+        a1_0.created_at,
+        a1_0.dustbin_id,
+        a1_0.severity_level,
+        a1_0.status 
+    from
+        alerts a1_0
+Hibernate: 
+    select
+        d1_0.dustbin_id,
+        d1_0.bin_id,
+        d1_0.created_at,
+        d1_0.fill_level,
+        d1_0.last_updated,
+        d1_0.latitude,
+        d1_0.location_name,
+        d1_0.longitude,
+        d1_0.odor_level,
+        d1_0.status 
+    from
+        dustbins_live d1_0 
+    where
+        d1_0.dustbin_id=?
+Hibernate: 
+    select
+        d1_0.dustbin_id,
+        d1_0.bin_id,
+        d1_0.created_at,
+        d1_0.fill_level,
+        d1_0.last_updated,
+        d1_0.latitude,
+        d1_0.location_name,
+        d1_0.longitude,
+        d1_0.odor_level,
+        d1_0.status 
+    from
+        dustbins_live d1_0 
+    where
+        d1_0.dustbin_id=?
+Hibernate: 
+    select
+        d1_0.dustbin_id,
+        d1_0.bin_id,
+        d1_0.created_at,
+        d1_0.fill_level,
+        d1_0.last_updated,
+        d1_0.latitude,
+        d1_0.location_name,
+        d1_0.longitude,
+        d1_0.odor_level,
+        d1_0.status 
+    from
+        dustbins_live d1_0 
+    where
+        d1_0.dustbin_id=?

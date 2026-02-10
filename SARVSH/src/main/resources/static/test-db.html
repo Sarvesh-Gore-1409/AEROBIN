@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Verification | AeroBins</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .status-card {
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border-left: 5px solid;
+        }
+        .status-success {
+            background: #e8f5e9;
+            border-color: #4caf50;
+            color: #2e7d32;
+        }
+        .status-error {
+            background: #ffebee;
+            border-color: #f44336;
+            color: #c62828;
+        }
+        .status-info {
+            background: #e3f2fd;
+            border-color: #2196f3;
+            color: #1565c0;
+        }
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        .btn:hover {
+            background: #764ba2;
+        }
+        .info-item {
+            margin: 10px 0;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 5px;
+        }
+        .info-label {
+            font-weight: bold;
+            color: #666;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Database Verification Tool</h1>
+        
+        <div style="text-align: center; margin: 20px 0;">
+            <button class="btn" onclick="verifyDatabase()">🔍 Verify Database</button>
+            <button class="btn" onclick="testLogin()">🧪 Test Login Save</button>
+            <button class="btn" onclick="viewAllData()">📊 View All Data</button>
+        </div>
+        
+        <div id="results"></div>
+    </div>
+
+    <script>
+        async function verifyDatabase() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<div class="status-info">Verifying database connection...</div>';
+            
+            try {
+                const response = await fetch('/api/login-activity/verify');
+                const data = await response.json();
+                
+                let html = '<div class="status-card ' + 
+                    (data.status === 'connected' ? 'status-success' : 'status-error') + '">';
+                html += '<h2>Database Status: ' + data.status.toUpperCase() + '</h2>';
+                html += '<p><strong>Message:</strong> ' + data.message + '</p>';
+                
+                if (data.tableExists) {
+                    html += '<div class="info-item">';
+                    html += '<span class="info-label">Table Exists:</span> ✅ Yes';
+                    html += '</div>';
+                    html += '<div class="info-item">';
+                    html += '<span class="info-label">Total Records:</span> ' + data.recordCount;
+                    html += '</div>';
+                }
+                
+                if (data.testSave) {
+                    html += '<div class="info-item">';
+                    html += '<span class="info-label">Test Save:</span> ' + 
+                        (data.testSave === 'success' ? '✅ Success' : '❌ Failed');
+                    if (data.testRecordId) {
+                        html += ' (ID: ' + data.testRecordId + ')';
+                    }
+                    if (data.testSaveError) {
+                        html += '<br><small style="color: red;">Error: ' + data.testSaveError + '</small>';
+                    }
+                    html += '</div>';
+                }
+                
+                if (data.error) {
+                    html += '<div class="info-item">';
+                    html += '<span class="info-label">Error Type:</span> ' + data.error;
+                    html += '</div>';
+                }
+                
+                html += '</div>';
+                html += '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                results.innerHTML = html;
+                
+            } catch (err) {
+                results.innerHTML = '<div class="status-error">' +
+                    '<h2>❌ Connection Failed</h2>' +
+                    '<p><strong>Error:</strong> ' + err.message + '</p>' +
+                    '<p>Make sure the application is running on http://localhost:8080</p>' +
+                    '</div>';
+            }
+        }
+        
+        async function testLogin() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<div class="status-info">Testing login save...</div>';
+            
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: 'TEST_USER_' + Date.now(),
+                        password: 'test123'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                let html = '<div class="status-card status-success">';
+                html += '<h2>✅ Login Test Successful</h2>';
+                html += '<div class="info-item">';
+                html += '<span class="info-label">Success:</span> ' + data.success;
+                html += '</div>';
+                if (data.activityId) {
+                    html += '<div class="info-item">';
+                    html += '<span class="info-label">Activity ID:</span> ' + data.activityId;
+                    html += '</div>';
+                }
+                html += '<div class="info-item">';
+                html += '<span class="info-label">Message:</span> ' + data.message;
+                html += '</div>';
+                html += '</div>';
+                html += '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                results.innerHTML = html;
+                
+                // Auto-refresh verification after 1 second
+                setTimeout(verifyDatabase, 1000);
+                
+            } catch (err) {
+                results.innerHTML = '<div class="status-error">' +
+                    '<h2>❌ Login Test Failed</h2>' +
+                    '<p><strong>Error:</strong> ' + err.message + '</p>' +
+                    '</div>';
+            }
+        }
+        
+        async function viewAllData() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<div class="status-info">Loading all login data...</div>';
+            
+            try {
+                const response = await fetch('/api/login-activity');
+                const data = await response.json();
+                
+                let html = '<div class="status-card status-info">';
+                html += '<h2>📊 All Login Records (' + data.length + ')</h2>';
+                
+                if (data.length === 0) {
+                    html += '<p>No records found. Try logging in first or run a test login.</p>';
+                } else {
+                    html += '<table style="width: 100%; border-collapse: collapse; margin-top: 10px;">';
+                    html += '<tr style="background: #667eea; color: white;">';
+                    html += '<th style="padding: 10px; text-align: left;">ID</th>';
+                    html += '<th style="padding: 10px; text-align: left;">Username</th>';
+                    html += '<th style="padding: 10px; text-align: left;">Time</th>';
+                    html += '<th style="padding: 10px; text-align: left;">Status</th>';
+                    html += '<th style="padding: 10px; text-align: left;">IP</th>';
+                    html += '</tr>';
+                    
+                    data.reverse().slice(0, 20).forEach(record => {
+                        const date = new Date(record.loginTime);
+                        html += '<tr style="border-bottom: 1px solid #ddd;">';
+                        html += '<td style="padding: 8px;">' + record.id + '</td>';
+                        html += '<td style="padding: 8px;"><strong>' + record.username + '</strong></td>';
+                        html += '<td style="padding: 8px;">' + date.toLocaleString() + '</td>';
+                        html += '<td style="padding: 8px; color: ' + 
+                            (record.success ? 'green' : 'red') + ';">' + 
+                            (record.success ? '✓ Success' : '✗ Failed') + '</td>';
+                        html += '<td style="padding: 8px;">' + (record.ipAddress || 'N/A') + '</td>';
+                        html += '</tr>';
+                    });
+                    
+                    html += '</table>';
+                    if (data.length > 20) {
+                        html += '<p style="margin-top: 10px;"><small>Showing last 20 of ' + data.length + ' records</small></p>';
+                    }
+                }
+                
+                html += '</div>';
+                results.innerHTML = html;
+                
+            } catch (err) {
+                results.innerHTML = '<div class="status-error">' +
+                    '<h2>❌ Failed to Load Data</h2>' +
+                    '<p><strong>Error:</strong> ' + err.message + '</p>' +
+                    '</div>';
+            }
+        }
+        
+        // Auto-verify on page load
+        window.onload = function() {
+            verifyDatabase();
+        };
+    </script>
+</body>
+</html>
+
+

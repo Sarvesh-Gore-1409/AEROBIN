@@ -1,0 +1,41 @@
+Loading dataset...
+Preprocessing data...
+
+Training Random Forest Classifier with parameters:
+ - n_estimators: 100
+ - random_state: 42
+
+Evaluating model...
+Model Accuracy: 83.33%
+
+Classification Report (Precision, Recall, F1-Score):
+              precision    recall  f1-score   support
+
+        Good       1.00      1.00      1.00         1
+    Moderate       1.00      0.50      0.67         2
+        Poor       0.50      1.00      0.67         1
+      Severe       1.00      1.00      1.00         2
+
+    accuracy                           0.83         6
+   macro avg       0.88      0.88      0.83         6
+weighted avg       0.92      0.83      0.83         6
+
+
+Confusion Matrix:
+Labels: ['Good' 'Moderate' 'Poor' 'Severe']
+[[1 0 0 0]
+ [0 1 1 0]
+ [0 0 1 0]
+ [0 0 0 2]]
+
+Feature Importance:
+            Feature Importance
+          VOC_Index     28.41%
+Gas_Resistance_Ohms     23.56%
+     Fill_Level_Pct     19.60%
+       Humidity_Pct     12.58%
+      Temperature_C      8.97%
+               Hour      6.87%
+
+Saving model to D:\Aerobin\SARVSH\SARVSH\scripts\..\datasets\odour_model.pkl...
+Done!

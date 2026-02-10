@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Authority Access | AeroBins</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+</head>
+
+<body class="login-body">
+
+    <div class="bg-shape shape-1"></div>
+    <div class="bg-shape shape-2"></div>
+    <div class="glass login-card">
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <div
+                style="width: 60px; height: 60px; background: var(--primary-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; color: white;">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+            </div>
+            <h2 style="font-size: 1.75rem; font-weight: 700; color: var(--text-dark);">Authority Login</h2>
+            <p style="color: var(--text-light); margin-top: 0.5rem;">Access the Nagar Nigam Waste Monitoring Dashboard
+            </p>
+        </div>
+
+        <form id="login-form" novalidate>
+            <div class="form-group">
+                <label class="form-label" for="username">Username / ID</label>
+                <input type="text" id="username" class="form-input" placeholder="Enter your ID">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="password">Password</label>
+                <input type="password" id="password" class="form-input" placeholder="••••••••">
+            </div>
+
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; font-size: 0.9rem;">
+                <label style="display: flex; align-items: center; gap: 0.5rem; color: var(--text-light);">
+                    <input type="checkbox"> Remember me
+                </label>
+                <a href="#" style="color: var(--primary-green); font-weight: 600;">Forgot Password?</a>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
+                Login to Dashboard
+            </button>
+        </form>
+
+        <div style="text-align: center; margin-top: 2rem;">
+            <a href="index.html" style="color: var(--text-light); font-size: 0.9rem;">← Back to Home</a>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('login-form');
+        const submitButton = form.querySelector('button[type="submit"]');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+
+            if (!username || !password) {
+                alert('Please enter both username and password');
+                return;
+            }
+
+            // Disable button and show loading state
+            submitButton.disabled = true;
+            submitButton.textContent = 'Logging in...';
+
+            // Helper to perform successful login action
+            const performLoginSuccess = () => {
+                sessionStorage.setItem('loggedInUser', username);
+                sessionStorage.setItem('loginTime', new Date().toISOString());
+                window.location.href = 'dashboard.html';
+            };
+
+            try {
+                // Call the login endpoint
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                let data;
+                try {
+                    data = await response.json();
+                } catch (e) {
+                    data = {};
+                }
+
+                if (response.ok && data.success) {
+                    performLoginSuccess();
+                } else if (response.status === 404) {
+                    // Endpoint not found - likely running locally/static
+                    console.warn('Login endpoint not found. Proceeding with demo login.');
+                    performLoginSuccess();
+                } else {
+                    // Actual login failure (401, etc)
+                    const errorMessage = data.message || 'Invalid username or password';
+                    alert('Login failed: ' + errorMessage);
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'Login to Dashboard';
+                    document.getElementById('password').value = '';
+                }
+            } catch (err) {
+                // Network error (e.g., backend not running or file:// access)
+                console.warn('Backend unreachable. Proceeding with demo login.', err);
+                performLoginSuccess();
+            }
+        });
+    </script>
+</body>
+
+</html>

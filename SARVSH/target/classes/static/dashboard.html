@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authority Dashboard | AeroBins</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <!-- Leaflet Routing Machine CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
+    <style>
+        /* Internal overrides for specific dashboard new styles if needed immediately, 
+           ideally move to style.css later */
+        body {
+            background-color: #f8fafc;
+        }
+
+        .nav-link {
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            color: var(--text-light);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--primary-green);
+            background: rgba(0, 200, 83, 0.05);
+        }
+
+        .nav-link.active {
+            font-weight: 600;
+        }
+
+        .badge-count {
+            background: var(--danger);
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: 4px;
+        }
+
+        /* View Sections */
+        .view-section {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .view-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Grid */
+        .dustbin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .bin-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid #e2e8f0;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .bin-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .bin-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .status-tag {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 6px;
+            text-transform: uppercase;
+        }
+
+        .tag-critical {
+            background: #fef2f2;
+            color: #ef4444;
+        }
+
+        .tag-high {
+            background: #fff7ed;
+            color: #f97316;
+        }
+
+        .tag-medium {
+            background: #fffbeb;
+            color: #f59e0b;
+        }
+
+        .tag-low {
+            background: #ecfdf5;
+            color: #10b981;
+        }
+
+        .progress-container {
+            height: 8px;
+            background: #f1f5f9;
+            border-radius: 4px;
+            margin: 0.5rem 0 1rem 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        /* Lists for Alerts */
+        .alert-item {
+            display: flex;
+            align-items: center;
+            background: white;
+            padding: 1.25rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            border-left: 4px solid transparent;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .alert-critical {
+            border-left-color: #ef4444;
+        }
+
+        .alert-warning {
+            border-left-color: #f59e0b;
+        }
+
+        .alert-info {
+            border-left-color: #3b82f6;
+        }
+
+        /* Tables */
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .history-table th,
+        .history-table td {
+            text-align: left;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .history-table th {
+            background: #f8fafc;
+            font-weight: 600;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        /* Map Styles */
+        .map-container-tab {
+            width: 100%;
+            height: 600px;
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            border: 1px solid #e2e8f0;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        .control-panel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 320px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1.25rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            z-index: 1000;
+        }
+
+        .waypoint-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem;
+            background: #f8fafc;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .waypoint-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        .start-point {
+            background: var(--primary-green);
+        }
+
+        .dustbin-point {
+            background: var(--sky-blue-accent);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Top Navbar -->
+    <nav class="navbar"
+        style="background: white; border-bottom: 1px solid #e2e8f0; position: fixed; top: 0; width: 100%;">
+        <div class="container nav-content" style="max-width: 98%; padding: 0 1.5rem;">
+            <!-- Logo -->
+            <a href="#" class="logo" style="margin-right: 3rem;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 22h14a2 2 0 0 0 2-2V7.5L12 2 4 7.5V20a2 2 0 0 0 2 2z"></path>
+                    <path d="M12 2v5.5"></path>
+                    <path d="M12 22v-6.5"></path>
+                    <path d="M8 7.5l4-2.5 4 2.5"></path>
+                </svg>
+                AeroBins
+            </a>
+
+            <!-- Central Menu -->
+            <div class="nav-links" style="flex: 1; gap: 1rem;">
+                <div class="nav-link active" onclick="switchTab('dashboard', this)">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    Dashboard
+                </div>
+                <div class="nav-link" onclick="switchTab('route', this)">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>
+                    </svg>
+                    Route
+                </div>
+                <!-- Analytics placeholder mapped to empty view for now -->
+                <div class="nav-link" onclick="switchTab('analytics', this)">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="20" x2="18" y2="10"></line>
+                        <line x1="12" y1="20" x2="12" y2="4"></line>
+                        <line x1="6" y1="20" x2="6" y2="14"></line>
+                    </svg>
+                    Analytics
+                </div>
+                <div class="nav-link" onclick="switchTab('alerts', this)">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path
+                            d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z">
+                        </path>
+                        <line x1="12" y1="9" x2="12" y2="13"></line>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                    Alerts <span class="badge-count">3</span>
+                </div>
+                <div class="nav-link" onclick="switchTab('history', this)">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    History
+                </div>
+                <div class="nav-link" onclick="switchTab('settings', this)">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path
+                            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                        </path>
+                    </svg>
+                    Settings
+                </div>
+            </div>
+
+            <!-- User Profile -->
+            <div
+                style="display: flex; align-items: center; gap: 1rem; border-left: 1px solid #e2e8f0; padding-left: 1.5rem;">
+                <div style="text-align: right; line-height: 1.2;">
+                    <div style="font-weight: 600; font-size: 0.9rem;">Officer Sharma</div>
+                    <div style="font-size: 0.75rem; color: var(--text-light);">Waste Management Operator</div>
+                </div>
+                <!-- Profile Avatar -->
+                <div
+                    style="width: 40px; height: 40px; background: #047857; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">
+                    OS
+                </div>
+                <!-- Logout -->
+                <button onclick="window.location.href='index.html'" title="Logout"
+                    style="background: none; border: none; cursor: pointer; color: var(--text-light); padding: 0.5rem;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <div class="container" style="margin-top: 5rem; padding-bottom: 3rem; max-width: 98%;">
+
+        <!-- =================== DASHBOARD VIEW =================== -->
+        <div id="view-dashboard" class="view-section active">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text-dark)"
+                        stroke-width="2">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                        <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                    <h2 style="font-size: 1.5rem; font-weight: 700;">Live Dustbin Monitoring</h2>
+                </div>
+
+                <div style="display: flex; gap: 0.5rem;">
+                    <button id="filter-all" class="btn active-filter" onclick="filterBins('ALL', this)"
+                        style="padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.85rem; background: var(--primary-green); color: white;">All</button>
+                    <button id="filter-critical" class="btn" onclick="filterBins('CRITICAL', this)"
+                        style="padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.85rem; background: white; border: 1px solid #e2e8f0;">Critical</button>
+                    <button id="filter-high" class="btn" onclick="filterBins('HIGH', this)"
+                        style="padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.85rem; background: white; border: 1px solid #e2e8f0;">High
+                        Priority</button>
+                    <button id="filter-normal" class="btn" onclick="filterBins('NORMAL', this)"
+                        style="padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.85rem; background: white; border: 1px solid #e2e8f0;">Normal</button>
+                    <button class="btn"
+                        style="padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.85rem; background: white; border: 1px solid #e2e8f0;">
+                        Actions &#9662;
+                    </button>
+                </div>
+            </div>
+
+            <div class="dustbin-grid" id="dustbin-grid-container">
+                <!-- Dynamic Content Loading... -->
+                <div style="grid-column: 1/-1; text-align: center; padding: 2rem; color: var(--text-light);">
+                    Loading live dustbin data...
+                </div>
+            </div>
+        </div>
+
+        <script>
+            let allDustbins = []; // Store fetched data globally
+
+            document.addEventListener('DOMContentLoaded', fetchDustbins);
+
+            async function fetchDustbins() {
+                const grid = document.getElementById('dustbin-grid-container');
+                try {
+                    const response = await fetch('/api/dustbins');
+                    if (!response.ok) throw new Error('Failed to fetch data');
+
+                    allDustbins = await response.json();
+                    renderBins(allDustbins);
+
+                } catch (error) {
+                    console.error('Error fetching dustbins:', error);
+                    grid.innerHTML = `
+                        <div style="grid-column: 1/-1; text-align: center; padding: 2rem; color: var(--danger);">
+                            Error loading data. <br>
+                            <button onclick="fetchDustbins()" class="btn btn-primary" style="margin-top: 1rem;">Retry</button>
+                        </div>`;
+                }
+            }
+
+            function filterBins(filterType, btnElement) {
+                // Update active button state
+                document.querySelectorAll('.btn').forEach(btn => {
+                    if (btn.id && btn.id.startsWith('filter-')) {
+                        btn.style.background = 'white';
+                        btn.style.color = 'var(--text-dark)';
+                        btn.classList.remove('active-filter');
+                    }
+                });
+
+                if (btnElement) {
+                    btnElement.style.background = 'var(--primary-green)';
+                    btnElement.style.color = 'white';
+                    btnElement.classList.add('active-filter');
+                }
+
+                // Filter Logic
+                let filtered = [];
+                if (filterType === 'ALL') {
+                    filtered = allDustbins;
+                } else if (filterType === 'CRITICAL') {
+                    filtered = allDustbins.filter(bin => bin.fillLevel >= 90 || bin.status === 'FULL' || bin.odorLevel > 7.5);
+                } else if (filterType === 'HIGH') {
+                    filtered = allDustbins.filter(bin => (bin.fillLevel >= 75 && bin.fillLevel < 90) || (bin.odorLevel > 5 && bin.odorLevel <= 7.5));
+                } else if (filterType === 'NORMAL') {
+                    filtered = allDustbins.filter(bin => bin.fillLevel < 75 && bin.odorLevel <= 5 && bin.status !== 'FULL');
+                }
+
+                renderBins(filtered);
+            }
+
+            function renderBins(bins) {
+                const grid = document.getElementById('dustbin-grid-container');
+                grid.innerHTML = '';
+
+                if (bins.length === 0) {
+                    grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 2rem; color: var(--text-light);">No dustbins found for this category.</div>';
+                    return;
+                }
+
+                bins.forEach(bin => {
+                    const card = createBinCard(bin);
+                    grid.appendChild(card);
+                });
+            }
+
+            function createBinCard(bin) {
+                // Determine styling based on status/fill level
+                let statusClass = 'tag-low';
+                let statusText = bin.status || 'NORMAL';
+                let cardBorder = '';
+                let progressColor = 'var(--success)';
+                let iconBg = '#ecfdf5';
+                let iconColor = '#10b981';
+
+                const fill = bin.fillLevel || 0;
+
+                if (fill >= 90 || bin.status === 'FULL') {
+                    statusClass = 'tag-critical';
+                    statusText = 'CRITICAL';
+                    cardBorder = 'border-top: 4px solid #ef4444;';
+                    progressColor = 'var(--danger)';
+                    iconBg = '#fef2f2';
+                    iconColor = '#ef4444';
+                } else if (fill >= 75) {
+                    statusClass = 'tag-high';
+                    statusText = 'HIGH';
+                    progressColor = 'var(--warning)';
+                    iconBg = '#fff7ed';
+                    iconColor = '#f97316';
+                } else if (fill >= 50) {
+                    statusClass = 'tag-medium';
+                    statusText = 'MEDIUM';
+                    progressColor = 'var(--warning)';
+                    iconBg = '#fffbeb';
+                    iconColor = '#f59e0b';
+                }
+
+                // Create Card Element
+                const div = document.createElement('div');
+                div.className = 'bin-card';
+                if (cardBorder) div.style.cssText = cardBorder;
+
+                div.innerHTML = `
+                    <div class="bin-card-header">
+                        <div>
+                            <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.25rem;">${bin.location}</h3>
+                            <span class="status-tag ${statusClass}">${statusText}</span>
+                            <span style="font-size: 0.7rem; color: #94a3b8; display: block; margin-top: 4px;">ID: ${bin.binId}</span>
+                        </div>
+                        <div style="width: 32px; height: 32px; background: ${iconBg}; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: ${iconColor};">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 1rem;">
+                        <div style="font-size: 0.9rem; color: var(--text-light); margin-bottom: 0.5rem;">Odour Score: 
+                            <span style="color: ${bin.odorLevel > 7 ? '#ef4444' : bin.odorLevel > 4 ? '#f59e0b' : '#10b981'}; font-weight: 600;">
+                                ${bin.odorLevel} (${bin.odorLevel > 7 ? 'Poor' : bin.odorLevel > 4 ? 'Moderate' : 'Good'})
+                            </span>
+                        </div>
+
+                        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.25rem;">
+                            <span>Fill Level</span>
+                            <span>${fill}%</span>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar" style="width: ${fill}%; background: ${progressColor};"></div>
+                        </div>
+
+                        <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: var(--text-light);">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                            Last updated: ${new Date(bin.lastUpdated).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </div>
+                    </div>
+                `;
+                return div;
+            }
+        </script>
+
+        <!-- =================== ALERTS VIEW =================== -->
+        <div id="view-alerts" class="view-section">
+            <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem;">Alert Management</h2>
+            <p style="color: var(--text-light); margin-bottom: 2rem;">Monitor and manage system alerts</p>
+
+            <div id="alerts-container">
+                <!-- Alerts will be loaded here dynamically -->
+                <p style="text-align:center; color: var(--text-light);">Loading alerts...</p>
+            </div>
+        </div>
+
+        <script>
+            async function fetchAlerts() {
+                const container = document.getElementById('alerts-container');
+                if (!container) return;
+
+                try {
+                    const response = await fetch('/api/alerts');
+                    if (!response.ok) throw new Error('Failed to fetch alerts');
+                    const alerts = await response.json();
+
+                    const pendingAlerts = alerts.filter(a => a.status === 'Pending');
+
+                    if (pendingAlerts.length === 0) {
+                        container.innerHTML = '<p style="text-align:center; padding: 2rem; color: var(--success);">All caught up! No active alerts.</p>';
+                        // Update badge logic if you had one in navbar
+                        return;
+                    }
+
+                    let html = '';
+                    pendingAlerts.forEach(alert => {
+                        let alertClass = 'alert-info';
+                        let iconColor = '#3b82f6';
+                        let bgColor = '#eff6ff';
+                        let iconSvg = '';
+
+                        // Simple logic to style based on severity or type
+                        if (alert.severityLevel >= 3 || alert.alertType.includes('Critical')) {
+                            alertClass = 'alert-critical';
+                            iconColor = '#ef4444';
+                            bgColor = '#fef2f2';
+                        } else if (alert.severityLevel === 2) {
+                            alertClass = 'alert-warning';
+                            iconColor = '#f59e0b';
+                            bgColor = '#fffbeb';
+                        }
+
+                        // Customize Icon based on Type
+                        if (alert.alertType.includes('Odour')) {
+                            iconSvg = `<path d="M12 2.69l5.74 5.88 5.74 5.88c.17.16.28.38.32.61l1.81 12.39 1.8 12.39.06.34a.97.97 0 0 1-.5.98 1.45 1.45 0 0 1-1.09-.06L12 21.08l-6.23 3.11a1.45 1.45 0 0 1-1.09.06.97.97 0 0 1-.5-.98l.06-.34 1.8-12.39 1.81-12.39c.04-.23.15-.45.32-.61L5.63 7.51 12 2.69z"></path>`;
+                        } else if (alert.alertType.includes('Fill')) {
+                            iconSvg = `<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line>`;
+                        } else {
+                            iconSvg = `<circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line>`;
+                        }
+
+                        html += `
+                    <div class="alert-item ${alertClass}" id="alert-${alert.id}">
+                        <div style="width: 48px; height: 48px; background: ${bgColor}; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: ${iconColor}; margin-right: 1.5rem;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                ${iconSvg}
+                            </svg>
+                        </div>
+                        <div style="flex: 1;">
+                            <h4 style="font-weight: 700; margin-bottom: 0.25rem; color: ${iconColor};">${alert.alertType} Alert</h4>
+                            <p style="font-size: 0.9rem; color: var(--text-light);">${alert.alertMessage}</p>
+                            <div style="font-size: 0.8rem; color: var(--text-light); margin-top: 0.25rem;">
+                                ${new Date(alert.createdAt).toLocaleString()}
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn" onclick="resolveAlert(${alert.id})"
+                                style="padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.85rem; background: var(--success); color: white;">Resolve</button>
+                        </div>
+                    </div>
+                    `;
+                    });
+
+                    container.innerHTML = html;
+
+                    // Update badge count
+                    const badge = document.querySelector('.badge');
+                    if (badge) badge.innerText = pendingAlerts.length;
+
+                } catch (error) {
+                    console.error("Error fetching alerts:", error);
+                    container.innerHTML = '<p style="color:red; text-align:center;">Failed to load alerts.</p>';
+                }
+            }
+
+            async function resolveAlert(id) {
+                if (!confirm("Mark this alert as resolved?")) return;
+
+                try {
+                    const response = await fetch(`/api/alerts/${id}/resolve`, { method: 'PUT' });
+                    if (response.ok) {
+                        // Remove element from DOM or refresh
+                        const el = document.getElementById(`alert-${id}`);
+                        if (el) el.remove();
+
+                        // Update badge logic could go here
+                        // Refresh count just in case
+                        fetchAlerts();
+                    } else {
+                        alert("Failed to resolve alert.");
+                    }
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+        </script>
+
+        <!-- =================== HISTORY VIEW =================== -->
+        <div id="view-history" class="view-section">
+            <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem;">Collection History</h2>
+            <p style="color: var(--text-light); margin-bottom: 2rem;">Track your collection activities and performance
+            </p>
+
+            <div style="margin-bottom: 1.5rem; display: flex; gap: 1rem;">
+                <select style="padding: 0.5rem 1rem; border-radius: 6px; border: 1px solid #e2e8f0; background: white;">
+                    <option>Last 7 Days</option>
+                    <option>Last 30 Days</option>
+                </select>
+                <select style="padding: 0.5rem 1rem; border-radius: 6px; border: 1px solid #e2e8f0; background: white;">
+                    <option>All Locations</option>
+                </select>
+            </div>
+
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>Date & Time</th>
+                        <th>Location</th>
+                        <th>Fill Level</th>
+                        <th>Odour Score</th>
+                        <th>Collection Time</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Dec 13, 2024 14:30</td>
+                        <td>Connaught Place, Zone 1</td>
+                        <td style="color: #ef4444; font-weight: 600;">95%</td>
+                        <td style="color: #10b981;">Good</td>
+                        <td>8 minutes</td>
+                        <td><span
+                                style="background: #ecfdf5; color: #10b981; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">Completed</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Dec 13, 2024 13:15</td>
+                        <td>Karol Bagh Market</td>
+                        <td style="color: #f59e0b; font-weight: 600;">88%</td>
+                        <td style="color: #ef4444;">Poor</td>
+                        <td>12 minutes</td>
+                        <td><span
+                                style="background: #ecfdf5; color: #10b981; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">Completed</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Dec 13, 2024 11:45</td>
+                        <td>India Gate Area</td>
+                        <td style="color: #f59e0b; font-weight: 600;">65%</td>
+                        <td style="color: #f59e0b;">Moderate</td>
+                        <td>9 minutes</td>
+                        <td><span
+                                style="background: #ecfdf5; color: #10b981; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">Completed</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- =================== PLACEHOLDERS =================== -->
+        <!-- =================== ROUTE VIEW =================== -->
+        <div id="view-route" class="view-section">
+            <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;">Route Optimization</h2>
+            <p style="color: var(--text-light); margin-bottom: 1.5rem;">Optimal collection path for assigned dustbins
+            </p>
+
+            <div class="map-container-tab">
+                <div id="map"></div>
+
+                <div class="control-panel">
+                    <h3 style="margin-bottom: 0.5rem; color: var(--text-dark); font-size: 1.1rem;">Active Route</h3>
+
+                    <div style="max-height: 250px; overflow-y: auto; margin-bottom: 1rem;">
+                        <div class="waypoint-item">
+                            <div class="waypoint-icon start-point">S</div>
+                            <div>
+                                <div style="font-weight: 600; font-size: 0.9rem;">Employee Location</div>
+                                <div style="font-size: 0.75rem; color: var(--text-light);">Starting Point</div>
+                            </div>
+                        </div>
+                        <!-- Dynamic Dustbins -->
+                        <div id="dustbin-list"></div>
+                    </div>
+
+                    <div style="border-top: 1px solid #e2e8f0; padding-top: 1rem;">
+                        <div
+                            style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.9rem;">
+                            <span style="color: var(--text-light);">Total Distance:</span>
+                            <span id="total-dist" style="font-weight: 700;">Calculating...</span>
+                        </div>
+                        <div
+                            style="display: flex; justify-content: space-between; margin-bottom: 1rem; font-size: 0.9rem;">
+                            <span style="color: var(--text-light);">Est. Time:</span>
+                            <span id="total-time" style="font-weight: 700;">Calculating...</span>
+                        </div>
+                        <button class="btn btn-primary" style="width: 100%; padding: 0.6rem;"
+                            onclick="recalculateRoute()">Recalculate Route</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-analytics" class="view-section">
+            <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 2rem;">Analytics & Reports</h2>
+
+            <div style="display: flex; gap: 2rem; margin-bottom: 2rem; flex-wrap: wrap;">
+                <!-- Efficiency Card -->
+                <div class="card"
+                    style="flex: 1; min-width: 300px; display: flex; flex-direction: column; align-items: center; padding: 2rem;">
+                    <h3 style="margin-bottom: 1.5rem; color: var(--text-dark);">Collection Efficiency</h3>
+                    <div style="position: relative; width: 150px; height: 150px;">
+                        <canvas id="efficiencyChart"></canvas>
+                        <div style="position: absolute; top:50%; left:50%; transform: translate(-50%, -50%); font-size: 1.5rem; font-weight: bold; color: var(--success);"
+                            id="eff-val">0%</div>
+                    </div>
+                    <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-light);">Weekly collection
+                        efficiency rate</p>
+                </div>
+
+                <!-- Accuracy Card -->
+                <div class="card"
+                    style="flex: 1; min-width: 300px; display: flex; flex-direction: column; align-items: center; padding: 2rem;">
+                    <h3 style="margin-bottom: 1.5rem; color: var(--text-dark);">Odour Prediction Accuracy</h3>
+                    <div style="position: relative; width: 150px; height: 150px;">
+                        <canvas id="accuracyChart"></canvas>
+                        <div style="position: absolute; top:50%; left:50%; transform: translate(-50%, -50%); font-size: 1.5rem; font-weight: bold; color: var(--success);"
+                            id="acc-val">0%</div>
+                    </div>
+                    <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-light);">BME688 sensor prediction
+                        accuracy</p>
+                </div>
+            </div>
+
+            <!-- Trends Chart -->
+            <div class="card" style="padding: 2rem;">
+                <h3 style="margin-bottom: 1.5rem; color: var(--text-dark);">Weekly Collection Trends</h3>
+                <div style="height: 300px;">
+                    <canvas id="trendsChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            let effChartInstance = null;
+            let accChartInstance = null;
+            let trendsChartInstance = null;
+
+            async function fetchAnalytics() {
+                try {
+                    const response = await fetch('/api/analytics');
+                    const data = await response.json();
+
+                    // Update Overview
+                    document.getElementById('eff-val').innerText = data.efficiency + "%";
+                    document.getElementById('acc-val').innerText = data.accuracy + "%";
+
+                    // Update Donut Charts
+                    renderDonut('efficiencyChart', data.efficiency, '#00C853', 'effChartInstance');
+                    renderDonut('accuracyChart', data.accuracy, '#00C853', 'accChartInstance');
+
+                    // Update Trends Chart
+                    renderTrends('trendsChart', data.trends);
+
+                } catch (e) {
+                    console.error("Error fetching analytics", e);
+                }
+            }
+
+            function renderDonut(canvasId, value, color, instanceName) {
+                const ctx = document.getElementById(canvasId).getContext('2d');
+
+                // Destroy existing if needed (simple management)
+                if (window[instanceName]) window[instanceName].destroy();
+
+                window[instanceName] = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Value', 'Remaining'],
+                        datasets: [{
+                            data: [value, 100 - value],
+                            backgroundColor: [color, '#f1f5f9'],
+                            borderWidth: 0,
+                            cutout: '80%'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } }
+                    }
+                });
+            }
+
+            function renderTrends(canvasId, trends) {
+                const ctx = document.getElementById(canvasId).getContext('2d');
+
+                if (window.trendsChartInstance) window.trendsChartInstance.destroy();
+
+                window.trendsChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: trends.map(t => new Date(t.date).toLocaleDateString(undefined, { weekday: 'short' })),
+                        datasets: [{
+                            label: 'Collections Completed',
+                            data: trends.map(t => t.collectionsCompleted),
+                            backgroundColor: '#0288D1',
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+                            x: { grid: { display: false } }
+                        },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+            }
+        </script>
+
+        <div id="view-settings" class="view-section">
+            <h2 style="font-size: 1.5rem; font-weight: 700;">Settings</h2>
+            <p style="color: var(--text-light);">System settings would go here.</p>
+        </div>
+
+    </div>
+
+    <!-- Notification Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+
+    <script>
+        // Map State
+        let mapInitialized = false;
+        let map = null;
+        let routingControl = null;
+
+        function switchTab(viewId, element) {
+            // Hide all views
+            document.querySelectorAll('.view-section').forEach(view => {
+                view.classList.remove('active');
+            });
+
+            // Show selected view
+            document.getElementById('view-' + viewId).classList.add('active');
+
+            // Update active state in navbar
+            if (element) {
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    link.classList.remove('active');
+                });
+                element.classList.add('active');
+            }
+
+            // Initialize Map if Route tab is selected
+            if (viewId === 'route') {
+                setTimeout(() => {
+                    initRouteMap();
+                }, 100);
+            }
+
+            // Reload alerts if Alerts tab is selected
+            if (viewId === 'alerts') {
+                fetchAlerts();
+            }
+
+            // Load Analytics if Analytics tab is selected
+            if (viewId === 'analytics') {
+                fetchAnalytics();
+            }
+        }
+
+        async function initRouteMap() {
+            if (mapInitialized) {
+                map.invalidateSize();
+                return;
+            }
+
+            // Initialize Map
+            map = L.map('map').setView([28.6139, 77.2090], 13);
+            mapInitialized = true;
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+
+            var truckIcon = L.icon({
+                iconUrl: 'https://cdn-icons-png.flaticon.com/512/713/713311.png',
+                iconSize: [38, 38],
+                iconAnchor: [19, 38],
+                popupAnchor: [0, -38]
+            });
+
+            var binIcon = L.icon({
+                iconUrl: 'https://cdn-icons-png.flaticon.com/512/484/484662.png',
+                iconSize: [32, 32],
+                iconAnchor: [16, 32],
+                popupAnchor: [0, -32]
+            });
+
+            // Fetch Real Routes from Backend
+            try {
+                const response = await fetch('/api/routes');
+                if (!response.ok) throw new Error('Failed to fetch routes');
+                const routes = await response.json();
+
+                // Clear previous layers if any (not strictly needed on init but good practice)
+                // In a real refresh scenario we would clear layers here
+
+                // Employee/Depot Location (Static for now)
+                var employeeLocation = L.latLng(28.6139, 77.2090);
+                L.marker(employeeLocation, { icon: truckIcon }).addTo(map)
+                    .bindPopup("<b>Central Depot</b><br>Fleet Ready")
+                    .openPopup();
+
+                var listHtml = "";
+
+                // Add vehicles for each route
+                routes.forEach((route, index) => {
+                    const bin = route.dustbin;
+                    const latLng = L.latLng(bin.latitude, bin.longitude);
+
+                    // Add Marker for Target Dustbin
+                    L.marker(latLng, { icon: binIcon }).addTo(map)
+                        .bindPopup(`<b>${bin.location}</b><br>Fill Level: ${bin.fillLevel}%`);
+
+                    // Draw Route Path (Optimized)
+                    let routePoints = [];
+                    if (route.optimizedPathJson) {
+                        try {
+                            const points = JSON.parse(route.optimizedPathJson);
+                            routePoints = points.map(p => L.latLng(p.lat, p.lng));
+                            routePoints.unshift(employeeLocation);
+                            routePoints.push(latLng);
+                        } catch (e) {
+                            routePoints = [employeeLocation, latLng];
+                        }
+                    } else {
+                        routePoints = [employeeLocation, latLng];
+                    }
+
+                    const pathLine = L.polyline(routePoints, {
+                        color: index % 2 === 0 ? '#00C853' : '#2962FF',
+                        weight: 4,
+                        opacity: 0.7,
+                        dashArray: '10, 10'
+                    }).addTo(map);
+
+                    // Add to Sidebar List
+                    listHtml += `
+                        <div class="waypoint-item">
+                            <div class="waypoint-icon dustbin-point">${index + 1}</div>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600;">Vehicle #${101 + index} -> ${bin.binId}</div>
+                                <div style="font-size: 0.8rem; color: var(--text-dark);">Target: ${bin.location}</div>
+                                <div style="font-size: 0.75rem; color: var(--danger);">Fill: ${bin.fillLevel}% | Est: ${route.estimatedTimeMin} min</div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                document.getElementById('dustbin-list').innerHTML = listHtml;
+
+                // Update specific stats
+                if (routes.length > 0) {
+                    document.getElementById('total-dist').innerText = routes.reduce((acc, curr) => acc + curr.distanceKm, 0).toFixed(1) + " km";
+                    document.getElementById('total-time').innerText = routes.reduce((acc, curr) => acc + curr.estimatedTimeMin, 0) + " min";
+                } else {
+                    document.getElementById('dustbin-list').innerHTML = '<div style="padding:1rem;">No active routes assigned.</div>';
+                }
+
+            } catch (error) {
+                console.error("Error loading routes:", error);
+                document.getElementById('dustbin-list').innerHTML = '<div style="color:red; padding:1rem;">Failed to load route data.</div>';
+            }
+        }
+
+        function recalculateRoute() {
+            // Reload the simplified map
+            if (map) {
+                map.off();
+                map.remove();
+                mapInitialized = false;
+            }
+            initRouteMap();
+        }
+    </script>
+</body>
+
+</html>
